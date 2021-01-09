@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,17 +16,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.eshopping.R;
 import com.example.eshopping.firebasetree.Constants;
+import com.example.eshopping.firebasetree.NodeNames;
 import com.example.eshopping.model.CartProductModelClass;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.CartViewHolder> {
 
     private Context context;
     private List<CartProductModelClass> cartProductModelClassList;
+    int counter = 1;
 
     public CartProductAdapter(Context context, List<CartProductModelClass> cartProductModelClassList) {
         this.context = context;
@@ -43,9 +49,12 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
     public void onBindViewHolder(@NonNull CartProductAdapter.CartViewHolder holder, int position) {
         CartProductModelClass cartProductModelClass = cartProductModelClassList.get(position);
 
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
         String title = cartProductModelClass.getProductName();
         holder.cartProductTitleTextView.setText(title);
 
+        String cartItemId = cartProductModelClass.getCartItemId();
         String productId = cartProductModelClass.getProductId();
         String publisherId = cartProductModelClass.getProductPublisherId();
         StorageReference productImage = FirebaseStorage.getInstance().getReference().child(Constants.PRODUCTIMAGES).child(publisherId).child(productId);
@@ -57,8 +66,27 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
             }
         });
 
+        String stockQuantity = cartProductModelClass.getStockQuantity();
+
         String basePrice = cartProductModelClass.getProductPrice();
         holder.itemAmountTextView.setText(basePrice);
+
+        holder.deleteItemImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                firebaseFirestore.collection(NodeNames.CARTITEMS).document(cartItemId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context,"Item Deleted Successfully!!",Toast.LENGTH_LONG).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 
     @Override

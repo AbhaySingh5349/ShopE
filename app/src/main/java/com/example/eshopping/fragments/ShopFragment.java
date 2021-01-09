@@ -1,5 +1,6 @@
 package com.example.eshopping.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.eshopping.CartListActivity;
 import com.example.eshopping.R;
 import com.example.eshopping.adapter.ProductDisplayAdapter;
 import com.example.eshopping.firebasetree.NodeNames;
@@ -93,6 +95,13 @@ public class ShopFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+
+        cartImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), CartListActivity.class));
             }
         });
 

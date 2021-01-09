@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,10 +22,13 @@ import com.example.eshopping.R;
 import com.example.eshopping.firebasetree.Constants;
 import com.example.eshopping.model.ProductInfoModelClass;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAdapter.ProductDisplayViewHolder> {
 
@@ -35,6 +39,11 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         this.context = context;
         this.productInfoModelClassList = productInfoModelClassList;
     }
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+
+    String currentUserId;
 
     SharedPreferences sharedPreferences; // it allows to save and retrieve data in the form of key,value pair
 
@@ -47,9 +56,17 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         return new ProductDisplayViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ProductDisplayAdapter.ProductDisplayViewHolder holder, int position) {
         ProductInfoModelClass productInfoModelClass = productInfoModelClassList.get(position);
+
+
+        // retrieving current user
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        currentUserId = Objects.requireNonNull(firebaseUser).getUid();
 
         // getSharedPreferences() returns an instance pointing to the file that contains the values of preferences. By setting this mode, the file can only be accessed using calling application
 
@@ -77,23 +94,27 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
             }
         });
 
-        holder.priceTextView.setText(price + "$");
+        holder.priceTextView.setText("$" + price);
         holder.titleTextView.setText(title);
         progressDialog.dismiss();
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, ProductDetailActivity.class);
-                intent.putExtra("title",title);
-                intent.putExtra("price",price);
-                intent.putExtra("description",description);
-                intent.putExtra("quantity",quantity);
-                intent.putExtra("productId",productId);
-                intent.putExtra("publisherId",publisherId);
-                context.startActivity(intent);
-            }
-        });
+        if(Integer.parseInt(quantity)>0 || currentUserId.equals(publisherId)){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, ProductDetailActivity.class);
+                    intent.putExtra("title",title);
+                    intent.putExtra("price",price);
+                    intent.putExtra("description",description);
+                    intent.putExtra("quantity",quantity);
+                    intent.putExtra("productId",productId);
+                    intent.putExtra("publisherId",publisherId);
+                    context.startActivity(intent);
+                }
+            });
+        }else {
+            Toast.makeText(context,"Product Out Of Stock",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
