@@ -3,6 +3,7 @@ package com.example.eshopping.adapter;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.eshopping.ProductDetailActivity;
 import com.example.eshopping.R;
 import com.example.eshopping.firebasetree.Constants;
 import com.example.eshopping.model.ProductInfoModelClass;
@@ -60,12 +62,14 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         progressDialog.show();
 
         String productId = productInfoModelClass.getProductId();
+        String publisherId = productInfoModelClass.getProductPublisherId();
         String title = productInfoModelClass.getProductName();
         String price = productInfoModelClass.getProductPrice();
-        String publisherId = productInfoModelClass.getProductPublisherId();
+        String description = productInfoModelClass.getProductDescription();
+        String quantity = productInfoModelClass.getProductQuantity();
 
-        StorageReference postImage = FirebaseStorage.getInstance().getReference().child(Constants.PRODUCTIMAGES).child(publisherId).child(productId);
-        postImage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        StorageReference productImage = FirebaseStorage.getInstance().getReference().child(Constants.PRODUCTIMAGES).child(publisherId).child(productId);
+        productImage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onSuccess(Uri uri) {
@@ -76,6 +80,20 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         holder.priceTextView.setText(price + "$");
         holder.titleTextView.setText(title);
         progressDialog.dismiss();
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ProductDetailActivity.class);
+                intent.putExtra("title",title);
+                intent.putExtra("price",price);
+                intent.putExtra("description",description);
+                intent.putExtra("quantity",quantity);
+                intent.putExtra("productId",productId);
+                intent.putExtra("publisherId",publisherId);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
