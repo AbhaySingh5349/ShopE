@@ -61,7 +61,7 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
 
         String productId = productInfoModelClass.getProductId();
         String title = productInfoModelClass.getProductName();
-        String date = productInfoModelClass.getProductDate();
+        String price = productInfoModelClass.getProductPrice();
         String publisherId = productInfoModelClass.getProductPublisherId();
 
         StorageReference postImage = FirebaseStorage.getInstance().getReference().child(Constants.PRODUCTIMAGES).child(publisherId).child(productId);
@@ -73,7 +73,7 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
             }
         });
 
-        holder.dateTextView.setText(date);
+        holder.priceTextView.setText(price + "$");
         holder.titleTextView.setText(title);
         progressDialog.dismiss();
     }
@@ -83,9 +83,9 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         return productInfoModelClassList.size();
     }
 
-    public class ProductDisplayViewHolder extends RecyclerView.ViewHolder {
+    public static class ProductDisplayViewHolder extends RecyclerView.ViewHolder {
 
-        TextView titleTextView, dateTextView;
+        TextView titleTextView, priceTextView;
         ImageView productImageView;
 
         public ProductDisplayViewHolder(@NonNull View itemView) {
@@ -93,7 +93,7 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
 
             titleTextView = itemView.findViewById(R.id.titleTextView);
             productImageView = itemView.findViewById(R.id.productImageView);
-            dateTextView = itemView.findViewById(R.id.dateTextView);
+            priceTextView = itemView.findViewById(R.id.priceTextView);
         }
     }
 }
