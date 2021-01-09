@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -67,12 +69,37 @@ public class ProductDetailActivity extends AppCompatActivity {
         firebaseUser = firebaseAuth.getCurrentUser();
         currentUserId = Objects.requireNonNull(firebaseUser).getUid();
 
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
         productId = getIntent().getStringExtra("productId");
         publisherId = getIntent().getStringExtra("publisherId");
         title = getIntent().getStringExtra("title");
         price = getIntent().getStringExtra("price");
         description = getIntent().getStringExtra("description");
         quantity = getIntent().getStringExtra("quantity");
+
+
+        firebaseFirestore.collection(NodeNames.CARTITEMS).whereEqualTo(NodeNames.BUYERID,currentUserId).whereEqualTo(NodeNames.PRODUCTID,productId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+            //    addToCartImageView.setVisibility(View.INVISIBLE);
+                Log.e("Product purchased", queryDocumentSnapshots.getDocuments().toString());
+                if(queryDocumentSnapshots.getDocuments().size()>0){
+                    addToCartImageView.setVisibility(View.INVISIBLE);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ProductDetailActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if(publisherId.equals(currentUserId)){
+            addToCartImageView.setVisibility(View.INVISIBLE);
+        }else {
+            addToCartImageView.setVisibility(View.VISIBLE);
+        }
 
         StorageReference productImage = FirebaseStorage.getInstance().getReference().child(Constants.PRODUCTIMAGES).child(publisherId).child(productId);
         productImage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -95,7 +122,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         quantityTextInputEditText.setText(quantity);
         quantityTextInputEditText.setEnabled(false);
 
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         DocumentReference documentReference = firebaseFirestore.collection(NodeNames.CARTITEMS).document();
         String cartItemId  = documentReference.getId();
 
