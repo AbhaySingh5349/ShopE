@@ -31,7 +31,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Product Details"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -41,8 +41,8 @@
 
                 <ImageView
                     android:id="@+id/dashboardImageView"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="10dp"
@@ -53,6 +53,17 @@
                     app:srcCompat="@drawable/dashboard">
 
                 </ImageView>
+
+                <ImageView
+                    android:id="@+id/addToCartImageView"
+                    android:layout_width="36dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/add_to_cart"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
