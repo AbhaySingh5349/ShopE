@@ -23,4 +23,12 @@ public class NodeNames {
         public static final String CARTITEMID = "CartItemId";
         public static final String STOCKQUANTITY = "StockQuantity";
         public static final String BUYERID = "BuyerId";
+
+    public static final String DELIVERYADDRESSES = "DeliveryAddresses";
+        public static final String ADDRESS = "Address";
+        public static final String LATITUDE = "Latitude";
+        public static final String LONGITUDE = "Longitude";
+        public static final String CONTACT = "Contact";
+        public static final String PLACENAME = "PlaceName";
+        public static final String ADDRESSID = "AddressId";
 }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -65,6 +66,8 @@ public class ProfileActivity extends AppCompatActivity {
     TextView changePasswordTextView;
     @BindView(R.id.confirmBtn)
     Button confirmBtn;
+    @BindView(R.id.addressConstraintLayout)
+    ConstraintLayout addressConstraintLayout;
     @BindView(R.id.logoutBtn)
     Button logoutBtn;
 
@@ -126,6 +129,13 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     updateProfileInfo();
+                }
+            });
+
+            addressConstraintLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(ProfileActivity.this,AddressListActivity.class));
                 }
             });
 
