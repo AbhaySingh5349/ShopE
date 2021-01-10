@@ -1,7 +1,10 @@
 package com.example.eshopping.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.eshopping.CartListActivity;
 import com.example.eshopping.R;
 import com.example.eshopping.firebasetree.Constants;
 import com.example.eshopping.firebasetree.NodeNames;
@@ -31,7 +35,6 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
 
     private Context context;
     private List<CartProductModelClass> cartProductModelClassList;
-    int counter = 1;
 
     public CartProductAdapter(Context context, List<CartProductModelClass> cartProductModelClassList) {
         this.context = context;
@@ -69,7 +72,9 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
         String stockQuantity = cartProductModelClass.getStockQuantity();
 
         String basePrice = cartProductModelClass.getProductPrice();
-        holder.itemAmountTextView.setText(basePrice);
+        int cartQuantity = Integer.parseInt(cartProductModelClass.getDefaultCartQuantity());
+        double price = Integer.parseInt(basePrice)*cartQuantity;
+        holder.itemAmountTextView.setText(String.valueOf(price));
 
         holder.deleteItemImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +83,9 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(context,"Item Deleted Successfully!!",Toast.LENGTH_LONG).show();
+                        if (context instanceof CartListActivity) {
+                            ((CartListActivity)context).getCartItems();
+                        }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -85,6 +93,64 @@ public class CartProductAdapter extends RecyclerView.Adapter<CartProductAdapter.
                         Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
                     }
                 });
+            }
+        });
+
+        holder.addItemImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int cartQuantity = Integer.parseInt(cartProductModelClass.getDefaultCartQuantity());
+                if(cartQuantity <= Integer.parseInt(stockQuantity)){
+                    cartQuantity = cartQuantity+1;
+                    HashMap<String,Object> hashMap = new HashMap<>();
+                    hashMap.put(NodeNames.DEFAULTCARTQUANTITY,String.valueOf(cartQuantity));
+                    String cartItemId = cartProductModelClass.getCartItemId();
+                    int finalCartQuantity = cartQuantity;
+                    firebaseFirestore.collection(NodeNames.CARTITEMS).document(cartItemId).update(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            if (context instanceof CartListActivity) {
+                                ((CartListActivity)context).getCartItems();
+                            }
+                            double amount = Double.parseDouble(basePrice)*(finalCartQuantity);
+                            holder.itemAmountTextView.setText(String.valueOf(amount));
+                            holder.itemQuantityTextView.setText(String.valueOf(finalCartQuantity));
+                        }
+                    });
+                }else {
+                    Toast.makeText(context,"Limited Stock Available",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        holder.removeItemImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Integer.parseInt(cartProductModelClass.getDefaultCartQuantity()) > 1){
+                    HashMap<String,Object> hashMap = new HashMap<>();
+                    int cartQuantity = Integer.parseInt(cartProductModelClass.getDefaultCartQuantity());
+                    cartQuantity = cartQuantity-1;
+                    hashMap.put(NodeNames.DEFAULTCARTQUANTITY,String.valueOf(cartQuantity));
+                    String cartItemId = cartProductModelClass.getCartItemId();
+                    int finalCartQuantity = cartQuantity;
+                    firebaseFirestore.collection(NodeNames.CARTITEMS).document(cartItemId).update(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            if (context instanceof CartListActivity) {
+                                ((CartListActivity)context).getCartItems();
+                            }
+                            double amount = Double.parseDouble(basePrice)*(finalCartQuantity);
+                            holder.itemAmountTextView.setText(String.valueOf(amount));
+                            holder.itemQuantityTextView.setText(String.valueOf(finalCartQuantity));
+                            Toast.makeText(context,String.valueOf(finalCartQuantity),Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
             }
         });
     }

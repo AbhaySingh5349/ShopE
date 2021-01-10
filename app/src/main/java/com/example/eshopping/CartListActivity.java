@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,7 +81,10 @@ public class CartListActivity extends AppCompatActivity {
         cartListRecyclerView.setAdapter(cartProductAdapter);
 
         checkoutCardView.setVisibility(View.INVISIBLE);
+        getCartItems();
+    }
 
+    public void getCartItems() {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFirestore.collection(NodeNames.CARTITEMS).whereEqualTo(NodeNames.BUYERID,currentUserId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @SuppressLint("SetTextI18n")
@@ -95,34 +99,49 @@ public class CartListActivity extends AppCompatActivity {
                 if(cartProductModelClassList.size()==0){
                     cartListRecyclerView.setVisibility(View.INVISIBLE);
                     checkoutCardView.setVisibility(View.INVISIBLE);
-                    Toast.makeText(CartListActivity.this,"No Products Available in Cart",Toast.LENGTH_LONG);
+                    Toast.makeText(CartListActivity.this,"No Products Available in Cart",Toast.LENGTH_LONG).show();
                 }else {
                     cartListRecyclerView.setVisibility(View.VISIBLE);
+                    checkoutCardView.setVisibility(View.VISIBLE);
 
-                    cartImageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            checkoutCardView.setVisibility(View.VISIBLE);
-
-                            double subTotal = 0.0, shippingCharges = 0.0, total = 0.0;
-                            for (CartProductModelClass cartProductModelClass : cartProductModelClassList){
-                                double price = Double.parseDouble(cartProductModelClass.getProductPrice());
-                                int quantity = Integer.parseInt(cartProductModelClass.getDefaultCartQuantity());
-                                subTotal += price*quantity;
-                                shippingCharges += 0.1*subTotal;
-                            }
-                            total = subTotal + shippingCharges;
-                            subtotalTextView.setText("$" + subTotal);
-                            shippingChargesTextView.setText("$" + shippingCharges);
-                            amountTextView.setText("$" + total);
-                        }
-                    });
+                    double subTotal = 0.0, shippingCharges = 0.0, total = 0.0;
+                    for (CartProductModelClass cartProductModelClass : cartProductModelClassList){
+                        double price = Double.parseDouble(cartProductModelClass.getProductPrice());
+                        int quantity = Integer.parseInt(cartProductModelClass.getDefaultCartQuantity());
+                        subTotal += price*quantity;
+                    }
+                    shippingCharges = 0.1*subTotal;
+                    total = subTotal + shippingCharges;
+                    subtotalTextView.setText("$" + subTotal);
+                    shippingChargesTextView.setText("$" + shippingCharges);
+                    amountTextView.setText("$" + total);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(CartListActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseFirestore.collection(NodeNames.CARTITEMS).whereEqualTo(NodeNames.BUYERID,currentUserId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
+                    CartProductModelClass cartProductModelClass = documentSnapshot.toObject(CartProductModelClass.class);
+                    HashMap<String,Object> hashMap = new HashMap<>();
+                    hashMap.put(NodeNames.DEFAULTCARTQUANTITY, "1");
+                    firebaseFirestore.collection(NodeNames.CARTITEMS).document(cartProductModelClass.getCartItemId()).update(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                        }
+                    });
+                }
             }
         });
     }
