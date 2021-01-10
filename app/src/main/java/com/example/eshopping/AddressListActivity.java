@@ -86,6 +86,10 @@ public class AddressListActivity extends AppCompatActivity {
         deliveryAddressAdapter = new DeliveryAddressAdapter(this,deliveryAddressModelClassList);
         addressRecyclerView.setAdapter(deliveryAddressAdapter);
 
+        getAddressList();
+    }
+
+    public void getAddressList() {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFirestore.collection(NodeNames.DELIVERYADDRESSES).whereEqualTo(NodeNames.USERID,currentUserId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override

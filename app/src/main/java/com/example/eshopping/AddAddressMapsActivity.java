@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -293,6 +294,8 @@ public class AddAddressMapsActivity extends FragmentActivity implements OnMapRea
                             if(selectedLocationMarker!=null){
                                 selectedLocationMarker.remove(); // removing earlier selected marker
                             }
+                            startActivity(new Intent(AddAddressMapsActivity.this,AddressListActivity.class));
+                            finish();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
