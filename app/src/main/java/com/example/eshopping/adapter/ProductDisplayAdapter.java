@@ -98,23 +98,19 @@ public class ProductDisplayAdapter extends RecyclerView.Adapter<ProductDisplayAd
         holder.titleTextView.setText(title);
         progressDialog.dismiss();
 
-        if(Integer.parseInt(quantity)>0 || currentUserId.equals(publisherId)){
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, ProductDetailActivity.class);
-                    intent.putExtra("title",title);
-                    intent.putExtra("price",price);
-                    intent.putExtra("description",description);
-                    intent.putExtra("quantity",quantity);
-                    intent.putExtra("productId",productId);
-                    intent.putExtra("publisherId",publisherId);
-                    context.startActivity(intent);
-                }
-            });
-        }else {
-            Toast.makeText(context,"Product Out Of Stock",Toast.LENGTH_LONG).show();
-        }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ProductDetailActivity.class);
+                intent.putExtra("title",title);
+                intent.putExtra("price",price);
+                intent.putExtra("description",description);
+                intent.putExtra("quantity",quantity);
+                intent.putExtra("productId",productId);
+                intent.putExtra("publisherId",publisherId);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

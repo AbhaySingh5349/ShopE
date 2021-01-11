@@ -31,4 +31,9 @@ public class NodeNames {
         public static final String CONTACT = "Contact";
         public static final String PLACENAME = "PlaceName";
         public static final String ADDRESSID = "AddressId";
+
+    public static final String ORDERDETAILS = "OrderDetails";
+        public static final String PAYABLEAMOUNT = "PayableAmount";
+        public static final String ORDERID = "OrderId";
+        public static final String CARTITEMIDS = "CartItemIds";
 }

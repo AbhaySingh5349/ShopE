@@ -27,15 +27,16 @@
 
 
                 <TextView
+                    android:id="@+id/toolbarTitleTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/aller_it"
                     android:text="Address List"
-                    android:textSize="20sp"
                     android:textColor="#131111"
+                    android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:fontFamily="@font/aller_it"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/deleteImageView"
@@ -69,8 +70,8 @@
         android:id="@+id/addressRecyclerView"
         android:layout_width="364dp"
         android:layout_height="582dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addAddressBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

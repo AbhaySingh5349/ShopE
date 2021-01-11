@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,9 +18,11 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eshopping.adapter.DeliveryAddressAdapter;
+import com.example.eshopping.firebasetree.Constants;
 import com.example.eshopping.firebasetree.NodeNames;
 import com.example.eshopping.model.CartProductModelClass;
 import com.example.eshopping.model.DeliveryAddressModelClass;
@@ -40,6 +43,8 @@ import butterknife.ButterKnife;
 
 public class AddressListActivity extends AppCompatActivity {
 
+    @BindView(R.id.toolbarTitleTextView)
+    TextView toolbarTitleTextView;
     @BindView(R.id.addAddressBtn)
     Button addAddressBtn;
     @BindView(R.id.addressRecyclerView)
@@ -48,7 +53,9 @@ public class AddressListActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth; // to create object of Firebase Auth class to fetch currently loged in user
     FirebaseUser firebaseUser; // to create object of Firebase User class to get current user to store currently loged in user
 
-    String currentUserId;
+    String currentUserId, payableAmount = "";
+
+    ArrayList<String> cartItemIdArrayList = new ArrayList<>();
 
     List<DeliveryAddressModelClass> deliveryAddressModelClassList;
     DeliveryAddressAdapter deliveryAddressAdapter;
@@ -58,6 +65,9 @@ public class AddressListActivity extends AppCompatActivity {
     AlertDialog gpsAlertDialog;
     int gpsEnableRequestCode = 101;
 
+    boolean addressSelected = false;
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +84,22 @@ public class AddressListActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
         }
 
+        // receiving intent from CartListActivity
+        if(getIntent().hasExtra(Constants.ADDRESSSELECTED)){
+            addressSelected = getIntent().getBooleanExtra(Constants.ADDRESSSELECTED,false);
+        }
+        if(getIntent().hasExtra(NodeNames.PAYABLEAMOUNT)){
+            payableAmount = getIntent().getStringExtra(NodeNames.PAYABLEAMOUNT);
+        }
+        if(getIntent().hasExtra(NodeNames.CARTITEMIDS)){
+            cartItemIdArrayList = getIntent().getStringArrayListExtra(NodeNames.CARTITEMIDS);
+        }
+
+        if(addressSelected){
+            toolbarTitleTextView.setText("Select Address for Delivery");
+            addAddressBtn.setVisibility(View.GONE);
+        }
+
         addAddressBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,7 +109,7 @@ public class AddressListActivity extends AppCompatActivity {
 
         deliveryAddressModelClassList  = new ArrayList<>();
         addressRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        deliveryAddressAdapter = new DeliveryAddressAdapter(this,deliveryAddressModelClassList);
+        deliveryAddressAdapter = new DeliveryAddressAdapter(this,deliveryAddressModelClassList,addressSelected,payableAmount,cartItemIdArrayList);
         addressRecyclerView.setAdapter(deliveryAddressAdapter);
 
         getAddressList();
@@ -147,12 +173,5 @@ public class AddressListActivity extends AppCompatActivity {
                 Toast.makeText(AddressListActivity.this,"GPS not enabled,Unable to track user location",Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(AddressListActivity.this,ProfileActivity.class));
-        finish();
     }
 }

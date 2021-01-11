@@ -98,7 +98,7 @@
                 app:layout_constraintTop_toTopOf="@+id/textView" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/addressTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -115,12 +115,12 @@
                 android:layout_marginEnd="24dp"
                 android:layout_marginRight="24dp"
                 android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="@+id/textView3"
+                app:layout_constraintBottom_toBottomOf="@+id/addressTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView3" />
+                app:layout_constraintTop_toTopOf="@+id/addressTextView" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/contactTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -128,7 +128,7 @@
                 android:text="Total Amount:"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                app:layout_constraintTop_toBottomOf="@+id/addressTextView" />
 
             <TextView
                 android:id="@+id/amountTextView"
@@ -137,9 +137,9 @@
                 android:layout_marginEnd="24dp"
                 android:layout_marginRight="24dp"
                 android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="@+id/textView5"
+                app:layout_constraintBottom_toBottomOf="@+id/contactTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView5" />
+                app:layout_constraintTop_toTopOf="@+id/contactTextView" />
 
             <Button
                 android:id="@+id/checkOutBtn"

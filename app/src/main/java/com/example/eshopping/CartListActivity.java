@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.eshopping.adapter.CartProductAdapter;
 import com.example.eshopping.adapter.ProductDisplayAdapter;
+import com.example.eshopping.firebasetree.Constants;
 import com.example.eshopping.firebasetree.NodeNames;
 import com.example.eshopping.model.CartProductModelClass;
 import com.example.eshopping.model.ProductInfoModelClass;
@@ -56,6 +57,8 @@ public class CartListActivity extends AppCompatActivity {
     private List<CartProductModelClass> cartProductModelClassList;
     private CartProductAdapter cartProductAdapter;
 
+    private ArrayList<String> cartItemIdArrayList;
+
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
 
@@ -80,6 +83,8 @@ public class CartListActivity extends AppCompatActivity {
         cartProductAdapter = new CartProductAdapter(this,cartProductModelClassList);
         cartListRecyclerView.setAdapter(cartProductAdapter);
 
+        cartItemIdArrayList = new ArrayList<>();
+
         checkoutCardView.setVisibility(View.INVISIBLE);
         getCartItems();
     }
@@ -91,10 +96,12 @@ public class CartListActivity extends AppCompatActivity {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 cartProductModelClassList.clear();
+                cartItemIdArrayList.clear();
                 for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
                     CartProductModelClass cartProductModelClass = documentSnapshot.toObject(CartProductModelClass.class);
                     cartProductModelClassList.add(cartProductModelClass);
                     cartProductAdapter.notifyDataSetChanged();
+                    cartItemIdArrayList.add(cartProductModelClass.getCartItemId());
                 }
                 if(cartProductModelClassList.size()==0){
                     cartListRecyclerView.setVisibility(View.INVISIBLE);
@@ -115,6 +122,17 @@ public class CartListActivity extends AppCompatActivity {
                     subtotalTextView.setText("$" + subTotal);
                     shippingChargesTextView.setText("$" + shippingCharges);
                     amountTextView.setText("$" + total);
+
+                    checkOutBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(CartListActivity.this,AddressListActivity.class);
+                            intent.putExtra(Constants.ADDRESSSELECTED,true);
+                            intent.putExtra(NodeNames.PAYABLEAMOUNT,amountTextView.getText().toString());
+                            intent.putExtra(NodeNames.CARTITEMIDS,cartItemIdArrayList);
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
